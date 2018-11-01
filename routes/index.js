@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const storeController = require('../controllers/storeContoller');
 
 // Do work here
-router.get('/', (req, res) => {
-  // res.send('Hey! It works!');
-  res.render('hello',{
-    name: req.query.name
-  });
-});
+// we first pass it to my middleware and then as a next parameter we pass it to homePage.
+router.get('/', storeController.myMiddleWare , storeController.homePage);
+
+// 
+router.get('/reverse/:name', (req, res) => {
+  const reversed = [...req.params.name].reverse().join('');
+  res.send(reversed);
+})
 
 module.exports = router;
