@@ -1,9 +1,6 @@
-
-
-exports.myMiddleWare = (req, res,next) => {
-    req.name = 'wes';
-    next(); // here the next symbolises that the work was done by this middleware go to next middleware.
-}
+const mongoose = require('mongoose');
+// we will use the singelton property of mongoose to get the store.
+const Store = mongoose.model('Store');
 
 exports.homePage = (req, res) => {
     console.log(req.name);
@@ -11,11 +8,21 @@ exports.homePage = (req, res) => {
 }
 
 exports.addStore = (req, res) => {
-    res.render('editStore' , {
+    res.render('editStore', {
         title: 'Add Store'
     });
 }
+// Adding the keyword async tells the browser that the function that I AM writing is gowing to have some
+//awaits in it.
+exports.createStore = async (req, res) => {
+    const store = await (new Store(req.body)).save();
+    req.flash('success', `Successfully created ${store.name}. Care to leave a review`);
+    res.redirect(`/store/${store.slug}`);
+}
 
-exports.createStore = (req, res) => {
-    res.json(req.body);
+exports.getStores = async (req,res) => {
+    // query the database to get a list of all the available stores.
+    const stores = await Store.find();
+    // console.log(stores);
+    res.render('stores', { title: 'Stores', stores});
 }
