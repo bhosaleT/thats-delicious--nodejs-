@@ -41,7 +41,7 @@ exports.resize = async (req, res, next) => {
     next(); // skip to the next middleware.
     return;
   }
-  const extension = req.file.mimetype.split('/')[1];
+  const extension = req.file.mimetype.split("/")[1];
   req.body.photo = `${uuid.v4()}.${extension}`;
   // now we resize;
   const photo = await jimp.read(req.file.buffer);
@@ -93,4 +93,13 @@ exports.updateStore = async (req, res) => {
   );
   //redirect to say that the store was successfully updated.
   res.redirect(`/stores/${store._id}/edit`);
+};
+
+/* Getting the store by slug */
+exports.getStoreBySlug = async (req, res, next) => {
+  const store = await Store.findOne({ slug: req.params.slug });
+  if (!store) {
+    return next();
+  }
+  res.render('store', {store , title: store.name})
 };
