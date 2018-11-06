@@ -54,6 +54,7 @@ exports.resize = async (req, res, next) => {
 // Adding the keyword async tells the browser that the function that I AM writing is gowing to have some
 //awaits in it.
 exports.createStore = async (req, res) => {
+  req.body.author = req.user._id;
   const store = await new Store(req.body).save();
   req.flash(
     "success",
@@ -69,10 +70,16 @@ exports.getStores = async (req, res) => {
   res.render("stores", { title: "Stores", stores });
 };
 
+const confirmOwner = (store, user) => {
+  if(!store.author.equals(user._id)){
+    throw Error('You must own a store in order to edit it!');
+  }
+}
 exports.editStore = async (req, res) => {
   // find the store using the ID.
   const store = await Store.findOne({ _id: req.params.id });
   // confirm if the user is the owner of the store. TODO:
+  confirmOwner(store, req.user);
   // render out the edit form.
   res.render("editStore", { title: `Edit ${store.name}`, store });
 };
@@ -97,7 +104,7 @@ exports.updateStore = async (req, res) => {
 
 /* Getting the store by slug */
 exports.getStoreBySlug = async (req, res, next) => {
-  const store = await Store.findOne({ slug: req.params.slug });
+  const store = await Store.findOne({ slug: req.params.slug }).populate('author');
   if (!store) {
     return next();
   }
