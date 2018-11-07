@@ -71,10 +71,10 @@ exports.getStores = async (req, res) => {
 };
 
 const confirmOwner = (store, user) => {
-  if(!store.author.equals(user._id)){
-    throw Error('You must own a store in order to edit it!');
+  if (!store.author.equals(user._id)) {
+    throw Error("You must own a store in order to edit it!");
   }
-}
+};
 exports.editStore = async (req, res) => {
   // find the store using the ID.
   const store = await Store.findOne({ _id: req.params.id });
@@ -104,7 +104,9 @@ exports.updateStore = async (req, res) => {
 
 /* Getting the store by slug */
 exports.getStoreBySlug = async (req, res, next) => {
-  const store = await Store.findOne({ slug: req.params.slug }).populate('author');
+  const store = await Store.findOne({ slug: req.params.slug }).populate(
+    "author"
+  );
   if (!store) {
     return next();
   }
@@ -114,10 +116,29 @@ exports.getStoreBySlug = async (req, res, next) => {
 //Getting stores by tags.
 exports.getStoresByTag = async (req, res) => {
   const tag = req.params.tag;
-  const tagQuery = tag || {$exists: true};
+  const tagQuery = tag || { $exists: true };
   const tagsPromise = Store.getTagsList();
   const storesPromise = Store.find({ tags: tagQuery });
-  const [tags, stores] =await Promise.all([tagsPromise, storesPromise]);
- 
-  res.render('tag', {tags, title:"Tags", tag, stores} )
+  const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+
+  res.render("tag", { tags, title: "Tags", tag, stores });
+};
+
+exports.searchStores = async (req, res) => {
+  const stores = await Store.find(
+    {
+      $text: {
+        $search: req.query.q
+      }
+    },
+    {
+      score: {
+        $meta: "textScore"
+      }
+    }
+  ).sort({
+    score: { $meta: "textScore" }
+  }).limit(5);
+  // limit to only 5
+  res.json(stores);
 };
