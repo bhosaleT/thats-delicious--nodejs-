@@ -79,4 +79,12 @@ storeSchema.statics.getTagsList = function() {
   ]);
 };
 
+/* Find reviews where the stores._Id === reviews store property */
+
+storeSchema.virtual("reviews", {
+  ref: "Review", //what model to link
+  localField: "_id", //which field on the stores
+  foreignField: "store" // which field on the review
+});
+
 module.exports = mongoose.model("Store", storeSchema);
