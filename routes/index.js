@@ -80,6 +80,8 @@ router.post(
   catchErrors(reviewController.addReview)
 );
 
+router.get('/top',catchErrors(storeController.getTopStores) );
+
 /* API END POINTS */
 
 router.get("/api/search", catchErrors(storeController.searchStores));

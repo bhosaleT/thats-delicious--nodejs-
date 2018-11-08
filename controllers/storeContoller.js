@@ -5,7 +5,7 @@ const multer = require("multer");
 const jimp = require("jimp");
 const uuid = require("uuid");
 
-const User = mongoose.model('User');
+const User = mongoose.model("User");
 
 const multerOptions = {
   storage: multer.memoryStorage(),
@@ -67,7 +67,7 @@ exports.createStore = async (req, res) => {
 
 exports.getStores = async (req, res) => {
   // query the database to get a list of all the available stores.
-  const stores = await Store.find();
+  const stores = await Store.find().populate('reviews');
   // console.log(stores);
   res.render("stores", { title: "Stores", stores });
 };
@@ -181,10 +181,14 @@ exports.heartStore = async (req, res) => {
   res.json(user);
 };
 
-
 exports.getHearts = async (req, res) => {
   const stores = await Store.find({
     _id: { $in: req.user.hearts }
   });
-  res.render('stores', {title: 'Liked Stores', stores});
-}
+  res.render("stores", { title: "Liked Stores", stores });
+};
+
+exports.getTopStores = async (req, res) => {
+  const stores = await Store.getTopStores();
+  res.render("topStores", { stores, title: ` * Top Stores! *` });
+};
