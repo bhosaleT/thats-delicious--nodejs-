@@ -41,7 +41,12 @@ const storeSchema = new mongoose.Schema({
     ref: "User",
     required: "You must supply an author"
   }
-});
+},{
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true}
+}
+
+);
 
 /* Defining our indexes */
 storeSchema.index({
